@@ -236,7 +236,7 @@ function execScripts(data)
 
 
 /* getHighestZ
-   return the highest z-index DOM Element
+   return the highest z-index from DOM Element childs
     - does not always work -   
    @return z-index (int)
 */   
