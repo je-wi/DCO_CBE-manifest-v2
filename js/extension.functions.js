@@ -1,7 +1,7 @@
 'use strict';
  /* addMultibleOptionElement
     add an input element to parent as child
-   @var parent_element
+   @var parent_element (DOM Element)
 */  
 function addMultibleOptionElement(parent)
   {
@@ -19,10 +19,9 @@ function addMultibleOptionElement(parent)
 
  /*  createMultibleOptionElement
    is used by building the options from storage and adding an element to the option
-   @var id
-   @var value
-   @var parent_element 
-     
+   @var id (int)
+   @var value (string)
+   @var parent_element (DOM Element)     
 */  
 function createMultibleOptionElement(id,value,parent)
   {
@@ -52,9 +51,9 @@ function createMultibleOptionElement(id,value,parent)
 
 
 /* countCharInString
-   @var string
-   @var char2count
-   @return int
+   @var thestring (string)
+   @var char2count (string)
+   @return number (int)
 */  
 function countCharInString(str,c)
   {
@@ -69,13 +68,14 @@ function countCharInString(str,c)
   }  
 
 
-/* doHEADRequest
-   sends only an HEAD request for status information
+/* doRequest
+   
    @var url (string)
+   @var method (string)
    @var callback (callback-function)
 
    @use 
-   doHEADRequest(url, function(data) {
+   doRequest(url, 'HEAD', function(data) {
      console.log(data.status);
     });
 
@@ -157,7 +157,7 @@ function doRequest(url, wr, callback)
     execute the 'main script' in tab-context
     its a kind of generic script call
           
-    @var object storage-data 
+    @var storage-data (browser.storage.local)
     @need browser.i18n
     @need browser.tabs
     @need browser.runtime
@@ -236,9 +236,9 @@ function execScripts(data)
 
 
 /* getHighestZ
-   return the highest z-index in the active window dom
+   return the highest z-index DOM Element
     - does not always work -   
-   @return int
+   @return z-index (int)
 */   
 function getHighestZ(doc)
   {
@@ -257,8 +257,8 @@ function getHighestZ(doc)
       }
     }); 
 
-  if(el)
-    el.classList.add('dco_cbe_zindex');
+  //if(el)
+  //  el.classList.add('dco_cbe_zindex');
        
   return z;
   }    
@@ -267,7 +267,7 @@ function getHighestZ(doc)
 
 /* localizeNode
    reads the attribute 'data-localize' from node and replace the innerHTML with the localized message
-   @var element node                            
+   @var node (DOM Element)                          
    @need browser.i18n
 */  
 function localizeNode(node)
@@ -287,13 +287,11 @@ function localizeNode(node)
    markILinksInDOC
    search for all a-tags in a document and add a class
    the location-object is used to differentiate between intern / extern
-   @var document-object
-   @var location-object
-   @var string 'intern' or 'extern'
-   @return int markerscount
+   @var document (document-object)
+   @var location (window.location)
+   @var 'intern' or 'extern' (string)
+   @return markerscount (int)
    @need splitHostname
-   
-   
    @use
    markILinksInDOC(document,window.location,'intern');
 */
@@ -489,7 +487,6 @@ function saveTheOptions()
   for(var i=0;i<opt3_els.length;i++ )
     {
     var el = opt3_els[i];
-    //var id = el.getAttribute('id').replace("option3_", '' );
     if( el.value!="" )
       {
       opt3[nid] = el.value; 
@@ -555,8 +552,8 @@ function setTheOptions()
 /* splitHostname
   split the parts of domain
                  
-  @var hostname
-  @return array
+  @var hostname (string)
+  @return top/second/third-level (array)
 */   
 function splitHostname(hostname)
   {
@@ -597,8 +594,8 @@ function splitHostname(hostname)
 /* 
    UnMarkILinksInDOC
    search for all a-tags in a document with attribue dco_m
-   @var document-object
-   @var string 'intern' or 'extern'
+   @var document (document-object)
+   @var 'intern' or 'extern' (string)
    @need splitHostname
    
    @use
