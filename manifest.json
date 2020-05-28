@@ -1,0 +1,33 @@
+{
+  "name": "DCO CBE",
+  "version": "0.1",
+  "description": "Digital Classics Online",
+  "permissions": ["tabs", "activeTab", "storage", "<all_urls>"],
+  "default_locale": "de",
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  
+  "background": {
+    "scripts": ["js/browser.js","js/background.js","js/extension.functions.js"],
+    "persistent": true
+  },
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "img/dco_16.png",
+      "32": "img/dco_32.png",
+      "48": "img/dco_48.png",
+      "128": "img/dco_128.png"
+    }
+  },
+  "icons": {
+    "16": "img/dco_16.png",
+    "32": "img/dco_32.png",
+    "48": "img/dco_48.png",
+    "128": "img/dco_128.png"
+  },
+
+  "manifest_version": 2
+}

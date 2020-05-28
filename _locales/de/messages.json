@@ -1,0 +1,13 @@
+{
+"popupTitle": { "message": "DCO CBE de" },
+"option1": { "message": "Auswahl 1" },
+"saveButton": { "message": "Speichern" }, 
+"cancelButton": { "message": "Abbrechen" },
+"loadOpt": { "message": "Geladen" }, 
+"savedOpt": { "message": "Gespeichert" },
+"popupContentTitleLV": { "message": "LV Intern" },
+"popupContentTitleLVE": { "message": "LV Extern" },
+"startButton": { "message": "Jetzt Prüfen" },
+"optionsButton": { "message": "Einstellungen" },
+"option1": { "message": "Verzögerung pro Link in Sekunden" } 
+}

@@ -1,0 +1,13 @@
+{
+"popupTitle": { "message": "DCO CBE en" },
+"option1": { "message": "Option 1" },
+"saveButton": { "message": "Save" },
+"cancelButton": { "message": "Cancel" }, 
+"loadOpt": { "message": "Loaded..." }, 
+"savedOpt": { "message": "Options saved" }, 
+"popupContentTitleLV": { "message": "LV Intern" },
+"popupContentTitleLVE": { "message": "LV Extern" },
+"startButton": { "message": "Validate Now" },
+"optionsButton": { "message": "Options" },
+"option1": { "message": "Validation delay in sec" }
+}

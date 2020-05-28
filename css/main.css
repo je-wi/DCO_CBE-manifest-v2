@@ -1,0 +1,37 @@
+/* main.css */
+
+#dco_cbe {
+  margin: 0;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  width: 400px;
+  background: #2968a6;
+  border: 2px solid #2968a6;
+  overflow: scroll;
+  font-family: arial;
+  font-size: 9pt;
+  color: white;
+  opacity: 0.9;
+  padding: 8px;  
+}
+
+.dco_cbe_lk {
+  background: yellow;
+} 
+
+.dco_cbe_lk_ok {
+  background: green;
+}
+
+.dco_cbe_lk_nok {
+  background: red;
+}
+
+.dco_cbe_zindex {
+  /*
+  background: blue;
+  border: 2px solid blue;
+  */
+}
