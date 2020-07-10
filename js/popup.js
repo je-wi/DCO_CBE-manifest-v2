@@ -316,8 +316,6 @@ var title_h2_lve = document.querySelector('#popup_h2_lve'); // title lv
           });          
 
       });
-      
-
   
   /* optionButton */
   popup_button_options.addEventListener("click", function(el) {  
