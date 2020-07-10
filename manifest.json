@@ -1,14 +1,13 @@
 {
   "name": "DCO CBE",
-  "version": "0.1",
+  "version": "0.2",
   "description": "Digital Classics Online",
-  "permissions": ["tabs", "activeTab", "storage", "<all_urls>"],
+  "permissions": ["tabs", "activeTab", "storage", "<all_urls>", "downloads"],
   "default_locale": "de",
   "options_ui": {
     "page": "options.html",
     "open_in_tab": true
   },
-  
   "background": {
     "scripts": ["js/browser.js","js/background.js","js/extension.functions.js"],
     "persistent": true
