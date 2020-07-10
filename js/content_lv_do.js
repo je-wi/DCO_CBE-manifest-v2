@@ -31,27 +31,28 @@ browser.storage.local.get(null, function(data)
               dco_cbe_link.classList.remove('dco_cbe_lk');   
               //dco_cbe_link.classList.add('dco_cbe_lk_ok');
               ok++;
+              dco_cbe.innerHTML+='<span class="dco_cbe_lk_ok">ok: '+url+'</span><br />';
               }
             else
               {
               dco_cbe_link.classList.remove('dco_cbe_lk');   
               dco_cbe_link.classList.add('dco_cbe_lk_nok');
               nok++; 
-              dco_cbe.innerHTML+= request.status+": "+url+'<br />';             
+              dco_cbe.innerHTML+='<span class="dco_cbe_lk_nok">'+request.status+': '+url+'</span><br />';             
               } 
-            //dco_cbe.innerHTML+= request.status+": "+url+'<br />'; 
+            // 
             //dco_cbe.innerHTML= "ok: "+ok+'<br />';   
             //dco_cbe.innerHTML+= "nok: "+nok+'<br />';                          
             });
         }, ld);  
     
       i++;
-      });
-    
+      });   
         
    };    
       
   // console.log( JSON.stringify(data));
+  
   
   
   });
