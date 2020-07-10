@@ -73,28 +73,4 @@ browser.storage.local.get(null, function(data)
     }
 
   //console.log( JSON.stringify(data));
-  });  
-  
-/*  
-function addStartButton(d,el,myid)
-  {
-  var button = d.createElement('button');
-  button.classList.add( "localize", "popup_button"); 
-  button.setAttribute('data-localize', 'startButton');
-  localizeNode(button);
-  el.appendChild(button);   
-  
-  button.addEventListener("click", function(el) {
-    var body = d.querySelector('body');
-    var scrpt2exec = document.createElement('script');
-    scrpt2exec.type = 'text/javascript';
-    scrpt2exec.id = myid;
-    scrpt2exec.src = 'js/content_lv_do.js';
-    body.appendChild(scrpt2exec);
-    //button.classList.remove("display_block");
-    button.classList.remove("popup_button");
-    button.classList.add("display_none");
-
-  }); 
-  }
-  */
+  });
