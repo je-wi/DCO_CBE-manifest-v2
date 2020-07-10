@@ -11,7 +11,7 @@
 */ 
 
 document.addEventListener("DOMContentLoaded", function(event) {
-  var save_el = document.querySelector('#saveButton');
+  var save_el = document.querySelector('#formoptions');
   var canc_el = document.querySelector('#cancelButton');
   
   /* localization of html-elements */
@@ -23,7 +23,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
   setTheOptions();
   
   /* click on saveButton */  
-  save_el.addEventListener("click", function(el) {
+  save_el.addEventListener("submit", function(el) {
+    //console.log(el);
     saveTheOptions();
     });
     
@@ -31,4 +32,4 @@ document.addEventListener("DOMContentLoaded", function(event) {
   canc_el.addEventListener("click", function(el) {
     setTimeout(function() { window.close(); }, 450);
     });    
-}); 
+});
