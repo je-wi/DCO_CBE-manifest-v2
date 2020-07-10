@@ -143,7 +143,8 @@ request.status:
 function doRequest(url, wr, callback)
   {
   var request = new XMLHttpRequest();
-  request.open(wr, url+ ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime());
+  //url = url+ ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
+  request.open(wr, url);
   request.setRequestHeader('Content-Type', 'text/html');
   //request.setRequestHeader(' X-Content-Type-Options:', 'nosniff');
   request.addEventListener('load', function(event) {
@@ -151,7 +152,8 @@ function doRequest(url, wr, callback)
       });
   request.send();
   } 
-
+  
+ 
 
  /* execScripts
     execute the 'main script' in tab-context
@@ -165,6 +167,7 @@ function doRequest(url, wr, callback)
 function execScripts(data)
   {
   var tabId = data.tabId;
+  var archive_url = data.option2+'/index.php/'+data.option3+'/issue/archive';
 
   if( typeof(tabId) == 'undefined' || tabId == null || tabId==0 ) 
     {
@@ -178,8 +181,10 @@ function execScripts(data)
 
      
     /* the tab and the popup are separeted - so we have to load some js and css in tab-context */     
-    if(!browser.runtime.lastError && tab && tab.url && tab.url.substring(0,6)!="chrome" && tab.url.substring(0,5)!="about" ) 
+    if(!browser.runtime.lastError && tab && tab.url && tab.url.substring(0,7)!="chrome:" && tab.url.substring(0,5)!="about" && tab.url==archive_url ) 
       {
+
+        
         // console.log("we are in tabId "+tabId+" with url "+tab.url);       
 
         /* browser.js */
@@ -207,11 +212,15 @@ function execScripts(data)
         /* content-script */
         if( data.isActive )
           {
+                   
           browser.tabs.executeScript(tabId, { file: 'js/content_lv.js' }, function() 
             {
+            //console.dir(document.querySelector('body'));
+            
             if (browser.runtime.lastError)
               console.log('There was an error injecting script js/content_lv.js: \n' + browser.runtime.lastError.message);
-            });            
+            });
+           
           
           }
         else
@@ -225,6 +234,18 @@ function execScripts(data)
           }
       
       } 
+    /*
+    else if(!browser.runtime.lastError && tab && tab.url && tab.url.substring(0,7)=="chrome-" && window.location.pathname=='/dco_archive.html')
+      {
+      var body = document.querySelector('body');
+      var scrpt2exec = document.createElement('script');
+      scrpt2exec.type = 'text/javascript';
+      scrpt2exec.id = 'myid';
+      scrpt2exec.src = 'js/content_lv.js';
+      body.appendChild(scrpt2exec);
+
+      }
+    */  
     else
       {
       // console.log("will do nothing");
@@ -276,9 +297,15 @@ function localizeNode(node)
   if( localizeKey!= null && localizeKey!='' )
     {
     var localizeMessage = browser.i18n.getMessage(localizeKey);
-       
+
     if( localizeMessage!='' )
-      node.innerHTML = localizeMessage;   
+      {
+       if(node.nodeName=="INPUT")
+         node.value=localizeMessage;
+        else
+         node.innerHTML = localizeMessage;    
+      }
+
     }
   }
   
@@ -480,7 +507,10 @@ function markILinksInDOC(doc,loc,w)
 function saveTheOptions()
   {
   var opt1 = document.querySelector('#option1').value;
+  var opt2 = document.querySelector('#option2').value;
+  var opt3 = document.querySelector('#option3').value;
   
+  /*
   var opt3 = {};
   var opt3_els =  document.querySelectorAll('#option3 .opt_multible');
   var nid = 0;
@@ -494,16 +524,22 @@ function saveTheOptions()
       }
     
     }
+  */
 
   var status = document.querySelector('#status');
   var savedMess = browser.i18n.getMessage('savedOpt') || 'Options saved.';
         
   browser.storage.local.set({
     option1: opt1,
-    option3: JSON.stringify(opt3)
+    //option3: JSON.stringify(opt3),
+    option2: opt2, 
+    option3: opt3       
     }, function() {
       status.textContent = savedMess;
-      setTimeout(function() { status.textContent = ''; window.close(); }, 1450);
+      setTimeout(function() { 
+        status.textContent = ''; 
+        //window.close(); 
+        }, 1450);
     });  
   }
   
@@ -517,7 +553,8 @@ function saveTheOptions()
 function setTheOptions()
   {
   var opt1_el = document.querySelector('#option1');
-  
+  var opt2_el = document.querySelector('#option2'); 
+  var opt3_el = document.querySelector('#option3');    
   /*
   var opt3_el = document.querySelector('#option3');
   var opt3_el_add = document.querySelector('#option3add');
@@ -533,6 +570,8 @@ function setTheOptions()
     {
     // set option1 value
     opt1_el.value = data.option1;
+    opt2_el.value = data.option2;    
+    opt3_el.value = data.option3;    
     
     // add foreach data.option3 one input element
     /*
@@ -634,4 +673,4 @@ function UnMarkILinksInDOC(doc,w)
     lk.removeAttribute('dco_m');    
     }
       
-  }          
+  }    
