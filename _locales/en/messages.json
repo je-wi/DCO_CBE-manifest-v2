@@ -8,6 +8,11 @@
 "popupContentTitleLV": { "message": "LV Intern" },
 "popupContentTitleLVE": { "message": "LV Extern" },
 "startButton": { "message": "Validate Now" },
+"issButton": { "message": "Open DCO Archive" },
+"downloadXML": { "message": "Download XML herunterladen" },
+"downloadAllPDF" : { "message": "Download all PDF" },
 "optionsButton": { "message": "Options" },
-"option1": { "message": "Validation delay in sec" }
+"option1": { "message": "Validation delay in sec" },
+"option2": { "message": "Journal URL (e.g.: https://journals.ub.uni-heidelberg.de)" }, 
+"option3": { "message": "Journal Shortname (e.g.: dco)" } 
 }
