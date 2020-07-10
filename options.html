@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<html>
   <head>
     <title></title>    
     <meta charset="utf-8">
@@ -15,6 +14,7 @@
   </head>
   <body>
     <div>
+    <form id="formoptions" action="#">
       <p>
       <label for="option1" class="localize" data-localize="option1">choose option 1</label>
         <select id="option1" class="">
@@ -25,8 +25,18 @@
           <option value="400">0.4</option>                      
         </select>      
       </p>
+      
+    <hr />  
+      
+     <p>
+      <label for="option2" class="localize" data-localize="option2">choose option 2</label>
+        <input type="text" id="option2" class="" autocomplete="of" maxlength="200" pattern="https?://.+" title="incl. http:// or https://" required="required" size="50" />
+    </p>      
      
-    
+    <p>
+      <label for="option3" class="localize" data-localize="option3">choose option 3</label>
+        <input type="text" id="option3" class="" autocomplete="of" maxlength="20" required="required" size="10"/>
+     </p>      
     <!--         
      <p>
       <label for="option2" class="localize" data-localize="option2">choose option 2</label>
@@ -49,10 +59,13 @@
       </p>      
      //--> 
           
-    </div>
-    <button id="cancelButton" class="localize opt_button" data-localize="cancelButton">Cancel</button> 
-    <button id="saveButton" class="localize opt_button" data-localize="saveButton">Save</button> 
 
-    <div id="status"></div>    
+    <button id="cancelButton" class="localize opt_button" data-localize="cancelButton">Cancel</button> 
+    <input type="submit" id="saveButton" class="localize opt_button" data-localize="saveButton" value="SaveIt"> 
+
+    <div id="status"></div>   
+    
+      </form>
+    </div>     
   </body>
 </html>
