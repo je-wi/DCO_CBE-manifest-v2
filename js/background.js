@@ -15,17 +15,20 @@
 browser.runtime.onInstalled.addListener(function() {
   browser.storage.local.clear();
   var bw = {};
-  var o3 = {};
+  //var o3 = {};
     browser.storage.local.set({
     isActive:false, 
     LVisActive:false, 
     LVEisActive:false, 
+    archiveLoaded:false,
     tabId:0, 
     windowId:0, 
     previousTabId:0, 
     previousWindowId:0, 
-    option1: 100,
-    option3: JSON.stringify(o3),     
+    option1: 100,    
+    option2:'https://journals.ub.uni-heidelberg.de',
+    option3: 'dco',
+    //option3: JSON.stringify(o3),     
     bodywith: JSON.stringify(bw)
    }, function() { });
   browser.browserAction.setBadgeText({text: 'OFF'});
@@ -56,4 +59,19 @@ browser.tabs.onUpdated.addListener(function(info) {
     {      
     //execScripts(data);
     }); 
-});   
+}); 
+
+
+browser.runtime.onMessage.addListener(
+  function(arg, sender, sendResponse) {
+    if(arg.message!=undefined && arg.message=='download')
+      {
+      var pdfs=arg.pdfs;
+      //console.log(args); 
+      for(var i=0;i<pdfs.length;i++)
+        {
+        browser.downloads.download({url: pdfs[i][0],filename: pdfs[i][1]},function(){} );
+        }     
+      }
+    sendResponse({response: "response from background script"});
+});
