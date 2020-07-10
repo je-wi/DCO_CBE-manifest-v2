@@ -20,7 +20,7 @@ if( !dco_cbe )
   }); 
   
   dco_cbe = document.createElement("div");   
-  dco_cbe.innerHTML = "<br />";
+  dco_cbe.innerHTML = '<img src="https://journals.ub.uni-heidelberg.de/public/journals/102/pageHeaderLogoImage_de_DE.jpg" width="400" height="42" alt=""><br />';
   dco_cbe.setAttribute("id","dco_cbe");                   
   document.body.appendChild(dco_cbe); 
 
@@ -39,13 +39,18 @@ browser.storage.local.get(null, function(data)
   { 
   var LVisActive = data.LVisActive;
   var LVEisActive = data.LVEisActive;
-  
+  var tabId = data.tabId;
   var marked;
   
   if( LVisActive )
     {
     marked = markILinksInDOC(document,window.location,'intern');
-    dco_cbe.innerHTML+= marked+' intern links has been marked<br />';    
+    dco_cbe.innerHTML+= marked+' intern links has been marked<br />'; 
+  
+    if(window.location.pathname=='/dco_archive.html')
+      addStartButton(document,dco_cbe,'myid');    
+    
+       
     }   
   else
     {
@@ -56,7 +61,11 @@ browser.storage.local.get(null, function(data)
   if( LVEisActive )
     {
     marked = markILinksInDOC(document,window.location,'extern'); 
-    dco_cbe.innerHTML+= marked+' extern links has been marked<br />';          
+    dco_cbe.innerHTML+= marked+' extern links has been marked<br />';  
+    
+    //if(window.location.pathname=='/dco_archive.html')
+    //  addStartButton(document,dco_cbe,'myid'); 
+    
     }    
   else
     {
@@ -65,3 +74,27 @@ browser.storage.local.get(null, function(data)
 
   //console.log( JSON.stringify(data));
   });  
+  
+/*  
+function addStartButton(d,el,myid)
+  {
+  var button = d.createElement('button');
+  button.classList.add( "localize", "popup_button"); 
+  button.setAttribute('data-localize', 'startButton');
+  localizeNode(button);
+  el.appendChild(button);   
+  
+  button.addEventListener("click", function(el) {
+    var body = d.querySelector('body');
+    var scrpt2exec = document.createElement('script');
+    scrpt2exec.type = 'text/javascript';
+    scrpt2exec.id = myid;
+    scrpt2exec.src = 'js/content_lv_do.js';
+    body.appendChild(scrpt2exec);
+    //button.classList.remove("display_block");
+    button.classList.remove("popup_button");
+    button.classList.add("display_none");
+
+  }); 
+  }
+  */
