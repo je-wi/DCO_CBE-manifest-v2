@@ -35,8 +35,8 @@ var title_h2_lve = document.querySelector('#popup_h2_lve'); // title lv
   browser.storage.local.get(null, function(data) {
     isActiveSwitch.checked = data.isActive;
     LVisActive.checked = data.LVisActive;
-    LVEisActive.checked = data.LVEisActive;    
-    
+    LVEisActive.checked = data.LVEisActive; 
+
     if( data.isActive )
       {
       // badge
@@ -141,7 +141,7 @@ var title_h2_lve = document.querySelector('#popup_h2_lve'); // title lv
           data.LVisActive = false; 
           data.LVEisActive = false; 
                      
-          browser.storage.local.set({LVisActive: false, LVEisActive: false}, function() 
+          browser.storage.local.set({LVisActive: false, LVEisActive: false, archiveLoaded: false}, function() 
             {          
             LVisActive.checked = false;
             LVEisActive.checked = false;         
@@ -150,8 +150,22 @@ var title_h2_lve = document.querySelector('#popup_h2_lve'); // title lv
           popup_div_lvstart.classList.remove("display_block");
           popup_div_lvstart.classList.add("display_none");                 
                              
-          execScripts(data);   
-
+          // remove the extra content from dom in active tab
+          execScripts(data);  
+          
+          // close archive url
+           var url = data.option2+'/index.php/'+data.option3+'/issue/archive';
+           browser.tabs.query({currentWindow: true}, function(res) {
+           for(var r=0;r<res.length;r++ )
+             {
+              if( res[r].url==url )
+                {
+                browser.tabs.remove(res[r].id,function(){} );
+                }           
+             }  
+  
+           });  
+         
                          
           }            
         }); 
@@ -231,7 +245,7 @@ var title_h2_lve = document.querySelector('#popup_h2_lve'); // title lv
     browser.tabs.executeScript(tabId, { file: 'js/content_lv_do.js' }, function() 
       {
       if (browser.runtime.lastError)
-        console.log('There was an error injecting script js/content_lv.js: \n' + browser.runtime.lastError.message);
+        console.log('There was an error injecting script js/content_lv_do.js: \n' + browser.runtime.lastError.message);
       });  
 
                   
@@ -241,7 +255,69 @@ var title_h2_lve = document.querySelector('#popup_h2_lve'); // title lv
    popup_div_lvstart.classList.remove("display_block");  
     
   }); 
+
   
+  
+  /* archive button */
+    var popup_button_iss = document.querySelector('#popup_button_iss'); 
+
+    popup_button_iss.addEventListener("click", function(el) { 
+    
+      browser.storage.local.get(null, function(data)
+        {  
+         var url = data.option2+'/index.php/'+data.option3+'/issue/archive';
+        
+        /* execute dco_archive.js */        
+        if(!data.archiveLoaded)
+          {
+           browser.tabs.create({ url: url, active: false }, function(tab) {
+            
+            browser.storage.local.set({archiveLoaded: true, tabId: tab.id }, function(){}); 
+            
+           
+            /* browser.js */
+            browser.tabs.executeScript(tab.id, { file: 'js/browser.js' }, function() 
+              {
+              if (browser.runtime.lastError) 
+                console.log('There was an error injecting script js/browser.js: \n' + browser.runtime.lastError.message);
+              }); 
+    
+            /* extension_functions.js */  
+            browser.tabs.executeScript(tab.id, { file: 'js/extension.functions.js' }, function() 
+              {
+              if (browser.runtime.lastError)
+                console.log('There was an error injecting script js/extension.functions.js: \n' + browser.runtime.lastError.message);
+              });           
+    
+            /* css file  */
+            browser.tabs.insertCSS(tab.id, { file: 'css/main.css' }, function() 
+              {
+              if (browser.runtime.lastError)
+                console.log('There was an error inserting css css/main.css: \n' + browser.runtime.lastError.message);
+              });            
+           
+           
+            browser.tabs.insertCSS(tab.id, { file: 'css/popup.css' }, function() 
+              {
+              if (browser.runtime.lastError)
+                console.log('There was an error inserting css css/main.css: \n' + browser.runtime.lastError.message);
+              }); 
+
+            browser.tabs.executeScript(tab.id, { file: 'js/dco_archive.js' }, function() 
+              {
+              if (browser.runtime.lastError)
+                console.log('There was an error injecting script js/content_lv.js: \n' + browser.runtime.lastError.message);
+              });          
+           
+           }); 
+         
+          }                 
+
+          });          
+
+      });
+      
+
   
   /* optionButton */
   popup_button_options.addEventListener("click", function(el) {  
@@ -249,4 +325,4 @@ var title_h2_lve = document.querySelector('#popup_h2_lve'); // title lv
   }); 
   
 });
-/* CBE default actions after loading the popup */ 
+/* CBE default actions after loading the popup */    
