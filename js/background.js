@@ -55,10 +55,17 @@ browser.tabs.onActivated.addListener(function(info) {
 // refreshing page
 browser.tabs.onUpdated.addListener(function(info) { 
 
+   /*
    browser.storage.local.get(null, function(data)
-    {      
-    //execScripts(data);
+    { 
+    browser.tabs.get(data.tabId, function(tab) 
+      {
+                if(!browser.runtime.lastError && tab && tab.url && tab.url.substring(0,7)!="chrome:" && tab.url.substring(0,5)!="about" ) 
+          browser.tabs.executeScript(tab.id, { code: 'console.dir(tab);var bbb = document.querySelector("[data-adblock-el=continueWithAdblockerButton]"); console.dir(bbb); if( bbb!=null && bbb!=undefined ) bbb.click(); '  }); 
+      }); 
     }); 
+    
+    */
 }); 
 
 
