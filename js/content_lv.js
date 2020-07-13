@@ -6,6 +6,8 @@
 */ 
 
 var dco_cbe = document.getElementById('dco_cbe');
+var dco_cbe_co = document.getElementById('dco_cbe_co');
+
 if( !dco_cbe )
   {
   var zindex = getHighestZ(document)+1000; 
@@ -20,16 +22,11 @@ if( !dco_cbe )
   }); 
   
   dco_cbe = document.createElement("div");   
-  dco_cbe.innerHTML = '<img src="https://journals.ub.uni-heidelberg.de/public/journals/102/pageHeaderLogoImage_de_DE.jpg" width="400" height="42" alt=""><br />';
+  dco_cbe.innerHTML = '<div id="dco_cbe_img"><img src="https://journals.ub.uni-heidelberg.de/public/journals/102/pageHeaderLogoImage_de_DE.jpg" width="364" height="40" alt=""></div><div id="dco_cbe_co"></div>';
   dco_cbe.setAttribute("id","dco_cbe");                   
-  document.body.appendChild(dco_cbe); 
-
+  document.body.appendChild(dco_cbe);
   newwidth = px-400;
-  //console.log('zindex:', zindex);
-  //console.log('width:', px);  
-  
   bbb.setAttribute('style','width:'+newwidth+'px !important; max-width:'+px+'px !important;'); 
-  //dco_cbe.setAttribute('zindex', zindex);
   dco_cbe.setAttribute('style', 'z-index:'+zindex); 
   }//end if
 
@@ -45,12 +42,7 @@ browser.storage.local.get(null, function(data)
   if( LVisActive )
     {
     marked = markILinksInDOC(document,window.location,'intern');
-    dco_cbe.innerHTML+= marked+' intern links has been marked<br />'; 
-  
-    if(window.location.pathname=='/dco_archive.html')
-      addStartButton(document,dco_cbe,'myid');    
-    
-       
+    dco_cbe_co.innerHTML+= marked+' intern links has been marked<br />'; 
     }   
   else
     {
@@ -61,16 +53,10 @@ browser.storage.local.get(null, function(data)
   if( LVEisActive )
     {
     marked = markILinksInDOC(document,window.location,'extern'); 
-    dco_cbe.innerHTML+= marked+' extern links has been marked<br />';  
-    
-    //if(window.location.pathname=='/dco_archive.html')
-    //  addStartButton(document,dco_cbe,'myid'); 
-    
+    dco_cbe_co.innerHTML+= marked+' extern links has been marked<br />';  
     }    
   else
     {
     UnMarkILinksInDOC(document,'extern');    
     }
-
-  //console.log( JSON.stringify(data));
   });
