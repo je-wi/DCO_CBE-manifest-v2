@@ -20,6 +20,7 @@ var isActiveSwitch = document.querySelector('#isActiveSwitch'); // cbe on ? true
 var LVisActive = document.querySelector('#LVisActive'); // lv on ? true:false
 var LVEisActive = document.querySelector('#LVEisActive'); // lve on ? true:false
 var popup_div_lvstart = document.querySelector('#popup_div_lvstart'); // button start
+var popup_div_iss = document.querySelector('#popup_div_iss'); // button archive
 var popup_button_options = document.querySelector('#popup_button_options'); // button options
 var popup_div_content = document.querySelector('#popup_div_content'); // div with the cbe content
 var title_popup = document.querySelector('#popup_h1'); // title cbe
@@ -35,7 +36,8 @@ var title_h2_lve = document.querySelector('#popup_h2_lve'); // title lv
   browser.storage.local.get(null, function(data) {
     isActiveSwitch.checked = data.isActive;
     LVisActive.checked = data.LVisActive;
-    LVEisActive.checked = data.LVEisActive; 
+    LVEisActive.checked = data.LVEisActive;
+    var isArchiveLoaded = data.archiveLoaded; 
 
     if( data.isActive )
       {
@@ -47,6 +49,12 @@ var title_h2_lve = document.querySelector('#popup_h2_lve'); // title lv
       popup_div_content.classList.remove("display_none");
       popup_div_content.classList.add("display_block");
       title_popup.style.color = 'var(--bg-color1)';
+      
+      if(!isArchiveLoaded)
+        {
+        popup_div_iss.classList.remove("display_none");
+        popup_div_iss.classList.add("display_block");        
+        }
           
       // lv
       if( data.LVisActive )
@@ -78,6 +86,9 @@ var title_h2_lve = document.querySelector('#popup_h2_lve'); // title lv
       // set the main div invisible
       popup_div_content.classList.remove("display_block");
       popup_div_content.classList.add("display_none");
+      
+      popup_div_iss.classList.remove("display_block");
+      popup_div_iss.classList.add("display_none");      
       
       title_popup.style.color = 'var(--bg-color2)';    
       title_h2_lv.style.color = 'var(--bg-color2)';
@@ -119,6 +130,9 @@ var title_h2_lve = document.querySelector('#popup_h2_lve'); // title lv
           popup_div_content.classList.remove("display_none");
           popup_div_content.classList.add("display_block");
           
+          popup_div_iss.classList.remove("display_none");
+          popup_div_iss.classList.add("display_block");
+                
           title_popup.style.color = 'var(--bg-color1)';
           
           execScripts(data);         
@@ -133,6 +147,9 @@ var title_h2_lve = document.querySelector('#popup_h2_lve'); // title lv
           // set the main div invisible
           popup_div_content.classList.remove("display_block");
           popup_div_content.classList.add("display_none");
+
+          popup_div_iss.classList.remove("display_block");
+          popup_div_iss.classList.add("display_none");          
           
           title_popup.style.color = 'var(--bg-color2)'; 
           title_h2_lv.style.color = 'var(--bg-color2)';
@@ -247,8 +264,6 @@ var title_h2_lve = document.querySelector('#popup_h2_lve'); // title lv
       if (browser.runtime.lastError)
         console.log('There was an error injecting script js/content_lv_do.js: \n' + browser.runtime.lastError.message);
       });  
-
-                  
     });     
 
    popup_div_lvstart.classList.add("display_none");
@@ -261,7 +276,7 @@ var title_h2_lve = document.querySelector('#popup_h2_lve'); // title lv
   /* archive button */
     var popup_button_iss = document.querySelector('#popup_button_iss'); 
 
-    popup_button_iss.addEventListener("click", function(el) { 
+    popup_button_iss.addEventListener("click", function(ev) { 
     
       browser.storage.local.get(null, function(data)
         {  
@@ -295,27 +310,25 @@ var title_h2_lve = document.querySelector('#popup_h2_lve'); // title lv
               if (browser.runtime.lastError)
                 console.log('There was an error inserting css css/main.css: \n' + browser.runtime.lastError.message);
               });            
-           
-           
-            browser.tabs.insertCSS(tab.id, { file: 'css/popup.css' }, function() 
-              {
-              if (browser.runtime.lastError)
-                console.log('There was an error inserting css css/main.css: \n' + browser.runtime.lastError.message);
-              }); 
 
             browser.tabs.executeScript(tab.id, { file: 'js/dco_archive.js' }, function() 
               {
               if (browser.runtime.lastError)
                 console.log('There was an error injecting script js/content_lv.js: \n' + browser.runtime.lastError.message);
-              });          
-           
+              });
            }); 
          
           }                 
 
-          });          
 
+          });          
+        
+       
+        ev.srcElement.parentElement.classList.remove("display_block");
+        ev.srcElement.parentElement.classList.add("display_none");
       });
+      
+
   
   /* optionButton */
   popup_button_options.addEventListener("click", function(el) {  
