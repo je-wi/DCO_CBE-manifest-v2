@@ -1,4 +1,32 @@
 'use strict';
+/* addLeadingHost
+   changes relative paths of href and img beginning with '/' to absolute paths 
+   @var node (Dom Element)
+   @var host (String)
+*/     
+function addLeadingHost(node,host)
+  {
+  var allImg = node.querySelectorAll('img, href');
+  for(var i=0; i<allImg.length; i++)
+    {
+    var src = allImg[i].getAttribute('src');
+    if( src != null && src.substring(0,1)=='/' )
+      {
+      allImg[i].setAttribute('src_origin',src);
+      src = host+src;
+      allImg[i].setAttribute('src',src);
+      }
+    
+    var href = allImg[i].getAttribute('href');
+    if( href != null && href.substring(0,1)=='/' )
+      {
+      allImg[i].setAttribute('href_origin',href);
+      href = host+href;
+      allImg[i].setAttribute('href',href);
+      }      
+    }                
+  }
+
  /* addMultibleOptionElement
     add an input element to parent as child
    @var parent_element (DOM Element)
@@ -20,7 +48,7 @@ function addMultibleOptionElement(parent)
  /*  createMultibleOptionElement
    is used by building the options from storage and adding an element to the option
    @var id (int)
-   @var value (string)
+   @var value (String)
    @var parent_element (DOM Element)     
 */  
 function createMultibleOptionElement(id,value,parent)
@@ -51,8 +79,8 @@ function createMultibleOptionElement(id,value,parent)
 
 
 /* countCharInString
-   @var thestring (string)
-   @var char2count (string)
+   @var thestring (String)
+   @var char2count (String)
    @return number (int)
 */  
 function countCharInString(str,c)
@@ -65,13 +93,83 @@ function countCharInString(str,c)
     }
   
   return num;
+  } 
+
+  
+ /* dcoArchiveSomeExtraButtons
+  put some buttons at the end of archive-site
+  uses global document in tab 
+*/ 
+function dcoArchiveSomeExtraButtons()
+  {
+  var content2show = document.querySelector('.issues_archive');    
+  var dlButton = document.createElement('BUTTON');
+  dlButton.setAttribute('id','downloadXML');
+  dlButton.innerHTML='downloadXML';
+  dlButton.classList.add('display_block','popup_button','localize');
+  dlButton.setAttribute('data-localize','downloadXML');
+  content2show.appendChild(dlButton);
+  
+  dlButton.addEventListener("click", function(el)
+    {  
+    browser.storage.local.get(null, function(data)
+      { 
+      var content = document.querySelector('#dco_archive_content'); 
+      
+      /* remove citavi-picker-content */
+      content.querySelectorAll('url span').forEach(function(el) {
+        el.parentNode.removeChild(el);
+      });    
+
+      downloadElementAsXML(content, data.option3+"_issues_"+getDateFromNow(2)+".xml", content);    
+      });      
+    });
+
+  var dlButton2 = document.createElement('BUTTON');
+  dlButton2.setAttribute('id','downloadAllPDF');
+  dlButton2.innerHTML='downloadAllPDF';
+  dlButton2.classList.add('display_block','popup_button','localize');
+  dlButton2.setAttribute('data-localize','downloadAllPDF');
+  content2show.appendChild(dlButton2);
+  dlButton2.addEventListener("click", function(el)
+    { 
+    browser.storage.local.get(null, function(data)
+      { 
+        var content2show = document.querySelector('.issues_archive');             
+        var pdfs = content2show.querySelectorAll('.obj_galley_link.pdf');  
+        var pdfs_array = [];         
+        for( var p=0; p<pdfs.length; p++ )
+          {
+          var pdfurl = pdfs[p].getAttribute('href').trim().replace('view','download');  
+          var n = pdfurl.indexOf("download/")+9;
+          var zu = ( pdfurl.indexOf('issue')!=-1 )?'issue':'article';
+          var fname2download = pdfurl.substring( n );
+            fname2download = data.option3+'_'+zu+'_'+fname2download.replace(/\//g,'_')+'.pdf'; 
+                     
+          //browser.downloads.download({url: pdfurl,filename: fname2download},function(){} ); // content_scripts in tab cant directly download - we have to send it to the background 
+          pdfs_array[p]= [pdfurl, fname2download]; 
+          } 
+          
+        var param = {pdfs : pdfs_array, message: 'download'};
+        browser.runtime.sendMessage(param, function(response) { 
+
+        } );        
+      }); 
+ 
+    });        
+  
+  /* localization of html-elements */
+  content2show.querySelectorAll('.localize').forEach(function(node) {
+    localizeNode(node);
+    });    
+  
   }  
 
 
 /* doRequest
    
-   @var url (string)
-   @var method (string)
+   @var url (String)
+   @var method (String)
    @var callback (callback-function)
 
    @use 
@@ -153,6 +251,32 @@ function doRequest(url, wr, callback)
   request.send();
   } 
   
+  
+/* downloadElementAsXML
+   download a dom element as xml; el is used to appenChild, click and removeChild
+   @var doc (Dom Element)
+   @var fileName (String)
+   @var el (Dom Element)
+   @use downloadElementAsXML(content, "my.xml", content);  
+*/ 
+function downloadElementAsXML(domel,fileName,el) 
+  {
+  var fileType = 'text/plain';   
+  var oSerializer = new XMLSerializer();
+  var sXML = oSerializer.serializeToString(domel);
+  sXML = '<?xml version="1.0" encoding="UTF-8"?>' + sXML;
+ 
+  var blob = new Blob([sXML], { type: fileType });
+  var a = document.createElement('a');
+  a.download = fileName;
+  a.href = URL.createObjectURL(blob);
+  a.dataset.downloadurl = [fileType, a.download, a.href].join(':');
+  a.style.display = "none";
+  el.appendChild(a);
+  a.click();
+  el.removeChild(a);
+  setTimeout(function() { URL.revokeObjectURL(a.href); }, 1500);
+  }  
  
 
  /* execScripts
@@ -255,6 +379,35 @@ function execScripts(data)
     });     
   }
 
+/* getDateFromNow
+   return a datestring from now
+   @var w (int)
+   1: 30/06/2020
+   2: 2020-06-30
+   @return date (int)  
+*/    
+function getDateFromNow(w=1)
+  {
+  var r = '';
+  var today = new Date();
+  var dd = today.getDate();
+  if(dd<10) dd='0'+dd; 
+  var mm = today.getMonth()+1;
+  if(mm<10) mm='0'+mm;  
+  var yyyy = today.getFullYear();
+
+  switch(w)
+    {
+    case 2:
+      r = yyyy+'-'+mm+'-'+dd;
+    break;
+    case 1:
+      r = dd+'/'+mm+'/'+yyyy;  
+    default:
+    break;
+    }
+  return r;
+  }
 
 /* getHighestZ
    return the highest z-index from DOM Element childs
@@ -316,7 +469,7 @@ function localizeNode(node)
    the location-object is used to differentiate between intern / extern
    @var document (document-object)
    @var location (window.location)
-   @var 'intern' or 'extern' (string)
+   @var 'intern' or 'extern' (String)
    @return markerscount (int)
    @need splitHostname
    @use
@@ -591,7 +744,7 @@ function setTheOptions()
 /* splitHostname
   split the parts of domain
                  
-  @var hostname (string)
+  @var hostname (String)
   @return top/second/third-level (array)
 */   
 function splitHostname(hostname)
@@ -634,7 +787,7 @@ function splitHostname(hostname)
    UnMarkILinksInDOC
    search for all a-tags in a document with attribue dco_m
    @var document (document-object)
-   @var 'intern' or 'extern' (string)
+   @var 'intern' or 'extern' (String)
    @need splitHostname
    
    @use
@@ -673,4 +826,4 @@ function UnMarkILinksInDOC(doc,w)
     lk.removeAttribute('dco_m');    
     }
       
-  }    
+  }          
