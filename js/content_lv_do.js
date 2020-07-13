@@ -5,7 +5,7 @@
      
 */ 
 
-var dco_cbe = document.getElementById('dco_cbe');
+var dco_cbe_co = document.getElementById('dco_cbe_co');
 
 browser.storage.local.get(null, function(data)
   { 
@@ -31,14 +31,14 @@ browser.storage.local.get(null, function(data)
               dco_cbe_link.classList.remove('dco_cbe_lk');   
               //dco_cbe_link.classList.add('dco_cbe_lk_ok');
               ok++;
-              dco_cbe.innerHTML+='<span class="dco_cbe_lk_ok">ok: '+url+'</span><br />';
+              dco_cbe_co.innerHTML+='<span class="dco_cbe_lk_ok">ok: '+url+'</span><br />';
               }
             else
               {
               dco_cbe_link.classList.remove('dco_cbe_lk');   
               dco_cbe_link.classList.add('dco_cbe_lk_nok');
               nok++; 
-              dco_cbe.innerHTML+='<span class="dco_cbe_lk_nok">'+request.status+': '+url+'</span><br />';             
+              dco_cbe_co.innerHTML+='<span class="dco_cbe_lk_nok">'+request.status+': '+url+'</span><br />';             
               } 
             // 
             //dco_cbe.innerHTML= "ok: "+ok+'<br />';   
@@ -52,7 +52,5 @@ browser.storage.local.get(null, function(data)
    };    
       
   // console.log( JSON.stringify(data));
-  
-  
-  
+
   });
