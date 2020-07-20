@@ -11,6 +11,8 @@
 "issButton": { "message": "DCO Archive öffnen" },
 "downloadXML": { "message": "XML herunterladen" },
 "downloadAllPDF" : { "message": "Alle PDF herunterladen" },
+"downloadAllPDFasBlob" : { "message": "Alle PDF als Base64-encoded XML herunterladen" },
+"bulkdownload" : { "message": "Es handelt sich um einen Massendownload. Trotzdem fortfahren?" },
 "optionsButton": { "message": "Einstellungen" },
 "option1": { "message": "Verzögerung pro Link in Sekunden" }, 
 "option2": { "message": "Journal URL (z.B.: https://journals.ub.uni-heidelberg.de)" }, 
