@@ -136,12 +136,35 @@ var content2show;
             for(var g=0; g<issue_galleys_list.length;g++)
               {
               var galleyElement = document.createElement("url");
-              galleyElement.setAttribute('type',issue_galleys_list[g].innerText.trim());
+              var type = issue_galleys_list[g].innerText.trim();
+              type = type.replace(' (Deutsch)','');
+              type = type.replace(' (English)','');
+              galleyElement.setAttribute('type',type);
               galleyElement.innerHTML=issue_galleys_list[g].getAttribute('href');
               urlElement.parentNode.appendChild(galleyElement);
+              if(type=='PDF')
+                {
+                /* adding an element with type downloadPDF */
+                var galleyElement2 = document.createElement("url");
+                galleyElement2.setAttribute('type',"downloadPDF");
+                galleyElement2.innerHTML=issue_galleys_list[g].getAttribute('href').replace('/view/','/download/'); 
+                urlElement.parentNode.appendChild(galleyElement2);               
+                }
+              
               }            
             
-            /* visible content div -begin */   
+            /* visible content div -begin */  
+            
+            /*
+            var pdf_gal = issue_galleys.querySelector('.obj_galley_link.pdf');
+            if( pdf_gal!=undefined )
+              {
+              var inputel = document.createElement('input');
+              inputel.setAttribute('type','checkbox');
+              inputel.setAttribute('value',pdf_gal.getAttribute('href') );
+              pdf_gal.parentNode.insertBefore(inputel,pdf_gal);
+              }
+            */ 
             issueElement2show.appendChild(issue_galleys);
             issueElement2show.appendChild(document.createElement('br'));
             issueElement2show.appendChild(document.createElement('br'));
@@ -227,6 +250,9 @@ var content2show;
                   var galley_link = galleys_links[gli];
                   var galley_href = galley_link.getAttribute('href').trim();
                   var galley_type = galley_link.innerText.trim();
+                  galley_type = galley_type.replace(' (Deutsch)','');
+                  galley_type = galley_type.replace(' (English)','');
+
                   var urlElement = document.createElement("url");
                   urlElement.setAttribute('type',galley_type);
                   urlElement.innerHTML=galley_href;
@@ -241,11 +267,16 @@ var content2show;
                   
                   }
                   
+                
+
+                  
                 /* visible content div -begin */ 
-                var article_div = document.querySelector('#'+article_id);  
+                var article_div = document.querySelector('#'+article_id);     
+                var abstract_p = doc_article.querySelector('.abstract p');
+                if( abstract_p!=null)
+                  article_div.appendChild(abstract_p);                            
                 /* visible content div -end */
-                
-                
+           
                 var pids = doc_article.querySelectorAll('.pubid_list');
                 for(var pi=0; pi<pids.length; pi++)
                   {
@@ -265,8 +296,21 @@ var content2show;
                   article_div.appendChild(pidPElement); 
                   /* visible content div -end */                                    
                   
-                  }//end for pids              
-              
+                  }//end for pids 
+                  
+                if( abstract_p!=null)
+                  {
+                  var abstractElement = document.createElement("abstract");
+                  abstractElement.innerHTML=abstract_p.innerHTML; 
+                  biblElement.appendChild(abstractElement);                  
+                  }                   
+                  
+                  
+                /* visible content div -begin */                 
+                var hr2sep = document.createElement('br');
+                article_div.appendChild(hr2sep);    
+                /* visible content div -end */                
+                             
               });
               
               }//end for section_articles
