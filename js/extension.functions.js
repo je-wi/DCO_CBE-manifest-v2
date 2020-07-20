@@ -102,7 +102,9 @@ function countCharInString(str,c)
 */ 
 function dcoArchiveSomeExtraButtons()
   {
-  var content2show = document.querySelector('.issues_archive');    
+  var content2show = document.querySelector('.issues_archive');   
+  var dco_cbe_co = document.getElementById('dco_cbe_co');
+   
   var dlButton = document.createElement('BUTTON');
   dlButton.setAttribute('id','downloadXML');
   dlButton.innerHTML='downloadXML';
@@ -119,9 +121,13 @@ function dcoArchiveSomeExtraButtons()
       /* remove citavi-picker-content */
       content.querySelectorAll('url span').forEach(function(el) {
         el.parentNode.removeChild(el);
-      });    
+      }); 
+      
+      var xmlfile = data.option3+"_issues_"+getDateFromNow(2)+".xml";  
+       
+dco_cbe_co.innerHTML+='downloading:<br>'+xmlfile+'<br>';  
 
-      downloadElementAsXML(content, data.option3+"_issues_"+getDateFromNow(2)+".xml", content);    
+      downloadElementAsXML(content, xmlfile, content);    
       });      
     });
 
@@ -135,9 +141,15 @@ function dcoArchiveSomeExtraButtons()
     { 
     browser.storage.local.get(null, function(data)
       { 
+      if( window.confirm(browser.i18n.getMessage('bulkdownload')) )
+        {      
+      
         var content2show = document.querySelector('.issues_archive');             
         var pdfs = content2show.querySelectorAll('.obj_galley_link.pdf');  
-        var pdfs_array = [];         
+        var pdfs_array = []; 
+
+dco_cbe_co.innerHTML+='downloading:<br>';          
+                
         for( var p=0; p<pdfs.length; p++ )
           {
           var pdfurl = pdfs[p].getAttribute('href').trim().replace('view','download');  
@@ -147,16 +159,100 @@ function dcoArchiveSomeExtraButtons()
             fname2download = data.option3+'_'+zu+'_'+fname2download.replace(/\//g,'_')+'.pdf'; 
                      
           //browser.downloads.download({url: pdfurl,filename: fname2download},function(){} ); // content_scripts in tab cant directly download - we have to send it to the background 
-          pdfs_array[p]= [pdfurl, fname2download]; 
+          pdfs_array[p]= [pdfurl, fname2download];
+
+dco_cbe_co.innerHTML+=fname2download+'<br>';          
+           
           } 
           
         var param = {pdfs : pdfs_array, message: 'download'};
         browser.runtime.sendMessage(param, function(response) { 
 
-        } );        
+
+        }); 
+        
+        }         
       }); 
  
-    });        
+    }); 
+    
+    
+
+  var dlButton3 = document.createElement('BUTTON');
+  dlButton3.setAttribute('id','downloadAllPDFasBlob');
+  dlButton3.innerHTML='blob';
+  dlButton3.classList.add('display_block','popup_button','localize');
+  dlButton3.setAttribute('data-localize','downloadAllPDFasBlob');
+  content2show.appendChild(dlButton3);    
+  dlButton3.addEventListener("click", function(el)
+    { 
+    browser.storage.local.get(null, function(data)
+      {
+      
+      if( window.confirm(browser.i18n.getMessage('bulkdownload')) )
+        {
+          var dco_archive_content = document.querySelector('#dco_archive_content');
+          //var dco_archive_content = dco_archive_c.cloneNode(true);
+          
+          var pdfs = dco_archive_content.querySelectorAll('[type="downloadPDF"]');
+          var length=pdfs.length;
+           
+          for(var p=0; p<length;p++ ) 
+            {     
+    
+            let embed = document.createElement("embed");
+            embed.setAttribute('encoding','base64');
+            embed.setAttribute('encoding-type','application/pdf');        
+            Array.prototype.slice.call(pdfs[p].parentNode.attributes).forEach(function(item) {        
+              embed.setAttribute(item.name,item.value);
+            }); 
+    
+            //pdfs[p].parentNode.appendChild(embed);
+            
+        
+            let request = new XMLHttpRequest();
+            
+            request.open('GET', pdfs[p].innerHTML.trim().replace('view','download'), true);
+            request.responseType = 'blob'; 
+            request.extraInfo = p; 
+                  
+            request.onload = function() {
+    
+              let reader = new FileReader();
+              reader.extraInfo = request.extraInfo;
+              reader.extraInfo2 = request.responseURL;
+              reader.readAsDataURL(request.response);
+              
+              reader.onload =  function(e){
+              embed.innerHTML=e.target.result.replace('data:application/pdf;base64,','');
+              
+              let pdfurl = reader.extraInfo2;
+              let n = pdfurl.indexOf("download/")+9;
+              let zu = ( pdfurl.indexOf('issue')!=-1 )?'issue':'article';
+              let fname2download = pdfurl.substring( n );
+                fname2download = data.option3+'_'+zu+'_'+fname2download.replace(/\//g,'_')+'.xml';           
+              downloadElementAsXML(embed, fname2download, dco_archive_content);  
+    
+    dco_cbe_co.innerHTML+=reader.extraInfo2+' loaded<br>'; 
+    
+                  
+              };
+              reader.onerror = function(event) {
+                  console.log("Failed to read file!\n\n" + reader.error);
+                };
+                
+            };
+            request.send();                 
+            /*          */
+          };        
+        }//end if
+       
+    
+
+      
+      });        
+    }); 
+                 
   
   /* localization of html-elements */
   content2show.querySelectorAll('.localize').forEach(function(node) {
@@ -304,8 +400,8 @@ function execScripts(data)
       console.log('There was an error in execScripts : \n' + browser.runtime.lastError.message);
 
      
-    /* the tab and the popup are separeted - so we have to load some js and css in tab-context */     
-    if(!browser.runtime.lastError && tab && tab.url && tab.url.substring(0,7)!="chrome:" && tab.url.substring(0,5)!="about" && tab.url==archive_url ) 
+    /* the tab and the popup are separeted - so we have to load some js and css in tab-context */      // && tab.url==archive_url
+    if(!browser.runtime.lastError && tab && tab.url && tab.url.substring(0,7)!="chrome:" && tab.url.substring(0,5)!="about" && tab.url.substring(0,11)!="view-source" ) 
       {
 
         
@@ -316,7 +412,7 @@ function execScripts(data)
           {
           if (browser.runtime.lastError) 
             console.log('There was an error injecting script js/browser.js: \n' + browser.runtime.lastError.message);
-          }); 
+          });   
 
         /* extension_functions.js */  
         browser.tabs.executeScript(tabId, { file: 'js/extension.functions.js' }, function() 
@@ -325,7 +421,7 @@ function execScripts(data)
             console.log('There was an error injecting script js/extension.functions.js: \n' + browser.runtime.lastError.message);
           });           
 
-        /* css file  */
+        /* css file  */   
         browser.tabs.insertCSS(tabId, { file: 'css/main.css' }, function() 
           {
           if (browser.runtime.lastError)
