@@ -9,7 +9,7 @@
 "popupContentTitleLVE": { "message": "LV Extern" },
 "startButton": { "message": "Validate Now" },
 "issButton": { "message": "Open DCO Archive" },
-"downloadXML": { "message": "Download XML herunterladen" },
+"downloadXML": { "message": "Download XML" },
 "downloadAllPDF" : { "message": "Download all PDF" }, 
 "bulkdownload" : { "message": "It is a bulk download. Continue anyway?" },
 "downloadAllPDFasBlob" : { "message": "Download PDF as base64-encoded XML" },
