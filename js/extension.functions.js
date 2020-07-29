@@ -1,4 +1,5 @@
 'use strict';
+
 /* addLeadingHost
    changes relative paths of href and img beginning with '/' to absolute paths 
    @var node (Dom Element)
@@ -148,33 +149,46 @@ dco_cbe_co.innerHTML+='downloading:<br>'+xmlfile+'<br>';
         var pdfs = content2show.querySelectorAll('.obj_galley_link.pdf');  
         var pdfs_array = []; 
 
-dco_cbe_co.innerHTML+='downloading:<br>';          
-                
-        for( var p=0; p<pdfs.length; p++ )
-          {
-          var pdfurl = pdfs[p].getAttribute('href').trim().replace('view','download');  
-          var n = pdfurl.indexOf("download/")+9;
-          var zu = ( pdfurl.indexOf('issue')!=-1 )?'issue':'article';
-          var fname2download = pdfurl.substring( n );
-            fname2download = data.option3+'_'+zu+'_'+fname2download.replace(/\//g,'_')+'.pdf'; 
-                     
-          //browser.downloads.download({url: pdfurl,filename: fname2download},function(){} ); // content_scripts in tab cant directly download - we have to send it to the background 
-          pdfs_array[p]= [pdfurl, fname2download];
+dco_cbe_co.innerHTML+='downloading:<br>';
 
-dco_cbe_co.innerHTML+=fname2download+'<br>';          
-           
-          } 
+          /* log download-status to local storage */
+          var dl = {};
+          for(var p=0; p<pdfs.length;p++ ) 
+            { 
+            var pdfurl = pdfs[p].getAttribute('href').trim().replace('view','download');  
+            var n = pdfurl.indexOf("download/")+9;
+            var zu = ( pdfurl.indexOf('issue')!=-1 )?'issue':'article';
+            var fname2download = pdfurl.substring( n );
+              fname2download = data.option3+'_'+zu+'_'+fname2download.replace(/\//g,'_')+'.pdf'; 
+
+            dl[p] = {};
+            dl[p]['url'] = pdfurl;
+            dl[p]['type'] = 'pdf';
+            dl[p]['state'] = 'queue';
+            dl[p]['name'] = fname2download; 
+            
+            dco_cbe_co.innerHTML+='queued: '+fname2download+'<br>';                     
+            } 
+          dco_cbe_co.innerHTML+=pdfs.length+' downloads queued';
           
-        var param = {pdfs : pdfs_array, message: 'download'};
-        browser.runtime.sendMessage(param, function(response) { 
-
-
-        }); 
-        
-        }         
-      }); 
+          browser.storage.local.remove('downloads',function() {});
+          browser.storage.local.set({ downloads: JSON.stringify(dl) }, function() { 
+            
+            var param = {message: 'download_pdf'};
+            browser.runtime.sendMessage(param, function(response) { 
+            });//send message  
+          
+          /*           
+            browser.storage.local.get(null, function(newdata) {
+                 console.dir( JSON.parse(newdata.downloads));
+              });//storage get             
+         */   
+                     
+          });//storage set          
+        }//if         
+      });//strorage get 
  
-    }); 
+    });//event listener 
     
     
 
@@ -197,58 +211,81 @@ dco_cbe_co.innerHTML+=fname2download+'<br>';
           var pdfs = dco_archive_content.querySelectorAll('[type="downloadPDF"]');
           var length=pdfs.length;
            
+          /* log download-status to local storage */
+          var dl = {};
           for(var p=0; p<length;p++ ) 
-            {     
-    
-            let embed = document.createElement("embed");
-            embed.setAttribute('encoding','base64');
-            embed.setAttribute('encoding-type','application/pdf');        
-            Array.prototype.slice.call(pdfs[p].parentNode.attributes).forEach(function(item) {        
-              embed.setAttribute(item.name,item.value);
-            }); 
-    
-            //pdfs[p].parentNode.appendChild(embed);
-            
-        
-            let request = new XMLHttpRequest();
-            
-            request.open('GET', pdfs[p].innerHTML.trim().replace('view','download'), true);
-            request.responseType = 'blob'; 
-            request.extraInfo = p; 
-                  
-            request.onload = function() {
-    
-              let reader = new FileReader();
-              reader.extraInfo = request.extraInfo;
-              reader.extraInfo2 = request.responseURL;
-              reader.readAsDataURL(request.response);
+            { 
+            let pdf2down = pdfs[p].innerHTML.trim().replace('view','download');
+            dl[pdf2down] = false;
+            } 
+          
+          browser.storage.local.remove('downloads',function() {});
+          browser.storage.local.set({ downloads: JSON.stringify(dl) }, function() { 
+          
+            for(var p=0; p<length;p++ ) 
+              {     
+      
+              let embed = document.createElement("embed");
+              embed.setAttribute('encoding','base64');
+              embed.setAttribute('encoding-type','application/pdf');        
+              Array.prototype.slice.call(pdfs[p].parentNode.attributes).forEach(function(item) {        
+                embed.setAttribute(item.name,item.value);
+              }); 
+      
+              //pdfs[p].parentNode.appendChild(embed);
               
-              reader.onload =  function(e){
-              embed.innerHTML=e.target.result.replace('data:application/pdf;base64,','');
+          
+              let request = new XMLHttpRequest();
+              let pdf2down = pdfs[p].innerHTML.trim().replace('view','download');
               
-              let pdfurl = reader.extraInfo2;
-              let n = pdfurl.indexOf("download/")+9;
-              let zu = ( pdfurl.indexOf('issue')!=-1 )?'issue':'article';
-              let fname2download = pdfurl.substring( n );
-                fname2download = data.option3+'_'+zu+'_'+fname2download.replace(/\//g,'_')+'.xml';           
-              downloadElementAsXML(embed, fname2download, dco_archive_content);  
-    
-    dco_cbe_co.innerHTML+=reader.extraInfo2+' loaded<br>'; 
-    
-                  
-              };
-              reader.onerror = function(event) {
-                  console.log("Failed to read file!\n\n" + reader.error);
-                };
+               
+              request.open('GET', pdf2down, true);
+              request.responseType = 'blob'; 
+              request.extraInfo = p; 
+              
+          
+              request.onload = function() {
+      
+                let reader = new FileReader();
+                reader.extraInfo = request.extraInfo;
+                reader.extraInfo2 = request.responseURL;
+                reader.readAsDataURL(request.response);
                 
-            };
-            request.send();                 
-            /*          */
-          };        
-        }//end if
-       
-    
+                reader.onload =  function(e){
+                embed.innerHTML=e.target.result.replace('data:application/pdf;base64,','');
+                
+                let pdfurl = reader.extraInfo2;
+                let n = pdfurl.indexOf("download/")+9;
+                let zu = ( pdfurl.indexOf('issue')!=-1 )?'issue':'article';
+                let fname2download = pdfurl.substring( n );
+                  fname2download = data.option3+'_'+zu+'_'+fname2download.replace(/\//g,'_')+'.xml';           
+                downloadElementAsXML(embed, fname2download, dco_archive_content);  
+      
+      dco_cbe_co.innerHTML+=reader.extraInfo2+' loaded<br>';
+                
+                updateDLstatus(pdfurl,true);  
 
+                 
+                 }; //reader onload
+                reader.onerror = function(event) {
+                  console.log("Failed to read file!\n\n" + reader.error);
+                 };//reader onerror
+                  
+              };//request onload
+              request.send();                 
+              /*                   */
+            
+            };//for
+             
+
+            
+            
+          });//storage set
+                    
+          
+
+                 
+        }//end if
       
       });        
     }); 
@@ -400,11 +437,9 @@ function execScripts(data)
       console.log('There was an error in execScripts : \n' + browser.runtime.lastError.message);
 
      
-    /* the tab and the popup are separeted - so we have to load some js and css in tab-context */      // && tab.url==archive_url
-    if(!browser.runtime.lastError && tab && tab.url && tab.url.substring(0,7)!="chrome:" && tab.url.substring(0,5)!="about" && tab.url.substring(0,11)!="view-source" ) 
+    /* the tab and the popup are separeted - so we have to load some js and css in tab-context */
+    if(!browser.runtime.lastError && tab && tab.url && tab.url.substring(0,6)!="chrome" && tab.url.substring(0,5)!="about" && tab.url.substring(0,11)!="view-source" && tab.url.substring(0,26)!="https://chrome.google.com/" ) 
       {
-
-        
         // console.log("we are in tabId "+tabId+" with url "+tab.url);       
 
         /* browser.js */
@@ -454,18 +489,6 @@ function execScripts(data)
           }
       
       } 
-    /*
-    else if(!browser.runtime.lastError && tab && tab.url && tab.url.substring(0,7)=="chrome-" && window.location.pathname=='/dco_archive.html')
-      {
-      var body = document.querySelector('body');
-      var scrpt2exec = document.createElement('script');
-      scrpt2exec.type = 'text/javascript';
-      scrpt2exec.id = 'myid';
-      scrpt2exec.src = 'js/content_lv.js';
-      body.appendChild(scrpt2exec);
-
-      }
-    */  
     else
       {
       // console.log("will do nothing");
@@ -533,7 +556,137 @@ function getHighestZ(doc)
   return z;
   }    
   
+/* listenDownloadsChange
+   listener for change-events from browser.downloads
+   
+   @need browser.downloads
+   @need browser.storage
+   @use browser.downloads.onChanged.addListener(listenDownloadsChange);
+*/
+function listenDownloadsChange(item) 
+  {
+  if(item.state && item.state.current=== "complete" )
+    {
+    var id = item.id;
+    browser.storage.local.get(null, function(newdata) 
+      {
+      var dls = JSON.parse(newdata.downloads);
+      var length = Object.keys(dls).length;      
+      for(var d=0; d<length;d++)
+        {
+        let dltype = dls[d]['type'];
+        let dlname = dls[d]['name'];
+        let dlurl = dls[d]['url']; 
+        let dlstate = dls[d]['state']; 
+         if(dlstate==id) 
+           {
+           updateDLstatus(dlurl,'complete');
+//console.log(d+': '+dlurl);
+          
+           /* necessary if the startBulkDownload takes only one at a time */
+           /* recursiv function-call */
+           /* ff had sometimes problems and stopped the recursive call - we try it with timeout */
+           window.setTimeout(startBulkDownload,1000,dltype);
+           //startBulkDownload(dltype);
+           }             
+          }//for     
+      }); //storage get
+    }//if
+  }
+  
+/* listenOnInstalled
+   listener for onInstall-event from browser.runtime
+   
+   @need browser.storage
+   @need browser.browserAction   
+   @use browser.runtime.onInstalled.addListener(listenOnInstalled);
+*/
+function listenOnInstalled()
+  {
+  browser.storage.local.clear();
+  var bw = {};
+  var dl = {};
+  //var o3 = {};
+    browser.storage.local.set({
+    isActive:false, 
+    LVisActive:false, 
+    LVEisActive:false, 
+    archiveLoaded:false,
+    tabId:0, 
+    windowId:0, 
+    previousTabId:0, 
+    previousWindowId:0, 
+    option1: 100,    
+    option2:'https://journals.ub.uni-heidelberg.de',
+    option3: 'dco',
+    //option3: JSON.stringify(o3), 
+    downloads: JSON.stringify(dl),    
+    bodywith: JSON.stringify(bw)
+   }, function() { });
+  browser.browserAction.setBadgeText({text: 'OFF'});
+  browser.browserAction.setBadgeBackgroundColor({color: "gray"});  
+  } 
+  
+/* listenOnMessage
+   listener for onActivated-event from browser.tabs
+   
+   @need browser.storage
+   @use browser.runtime.onMessage.addListener(listenOnMessage);
+*/
+function listenOnMessage(arg, sender, sendResponse)
+  {
+  if(arg.message!=undefined && arg.message=='download_pdf')
+    {
+    /* safari dont support downloads */      
+    startBulkDownload('pdf');
+    sendResponse({response: "Downloads started"});     
+    }
+  return true;    
+  }   
+  
+/* listenTabActivated
+   listener for onActivated-event from browser.tabs
+   
+   @need browser.storage
+   @use browser.tabs.onActivated.addListener(listenTabActivated);
+*/
+function listenTabActivated(info)
+  {
+  browser.storage.local.get(null, function(dataLast) {
+  var previousTabId = dataLast.tabId;
+  var previousWindowId = dataLast.windowId;     
+        
+   browser.storage.local.set({tabId: info.tabId, previousTabId:previousTabId, windowId:info.windowId, previousWindowId:previousWindowId  }, function() {
+     browser.storage.local.get(null, function(data)
+      {  
+      execScripts(data);
+      });
+    }); 
+  });  
+  } 
+  
+/* listenTabUpdated
+   listener for onActivated-event from browser.tabs
+   
+   @need browser.storage
+   @use browser.tabs.onUpdated.addListener(listenTabUpdated);
+*/
+function listenTabUpdated(info)
+  {
+   browser.storage.local.get(null, function(data)
+    { 
+    browser.tabs.get(data.tabId, function(tab) 
+      {
+      if( tab.status == 'complete' )
+        {
+        // first three 'loading'-events an then one 'complete'
+        // dom manipulation will not trigger the event
 
+        }
+
+      }); 
+    });   
+  }   
 
 /* localizeNode
    reads the attribute 'data-localize' from node and replace the innerHTML with the localized message
@@ -557,7 +710,28 @@ function localizeNode(node)
 
     }
   }
-  
+
+
+/*
+for debugging
+log the changes from storage in debugging-console - we only use the 'local'-area
+@use browser.storage.onChanged.addListener(logStorageChange);
+*/
+function logStorageChange(changes, area)
+  {
+  if( area=='local')
+    {
+    let changedItems = Object.keys(changes);
+     
+      for (let item of changedItems) {
+        console.log(item + " has changed:");
+        //console.log("Old value: ");
+        //console.log(changes[item].oldValue);
+        //console.log("New value: ");
+        console.log(changes[item].newValue);
+      }    
+    }   
+  }  
   
 /* 
    markILinksInDOC
@@ -792,6 +966,8 @@ function saveTheOptions()
     });  
   }
   
+
+ 
   
 /* setTheOptions
    load the options from browser.storage
@@ -877,7 +1053,55 @@ function splitHostname(hostname)
     }
   return r;
   } 
-  
+
+/* startBulkDownload
+   download files stored in storage.local.downloads
+   
+   @var type (String)
+   @need browser.downloads
+   @need browser.storage
+*/
+function startBulkDownload(type)
+  {
+  browser.storage.local.get(null, function(newdata) 
+    {
+    var dls = JSON.parse(newdata.downloads);
+    var something2down = false;
+    var length = Object.keys(dls).length;
+
+    for(var d=0; d<length; d++)
+      {
+      var dltype = dls[d]['type'];
+      var dlname = dls[d]['name'];
+      var dlurl = dls[d]['url']; 
+      var dlstate = dls[d]['state'];
+       
+      if( dltype==type && dlstate=='queue' )
+        {
+        something2down = true;
+        browser.downloads.download({url: dlurl,filename: dlname},function(prom){ 
+          
+        // it returns the id from downloadItem - download isn't completed at this time 
+        if( typeof(prom) == 'number' )
+          {
+          // state is set to downloadItem.id
+          updateDLstatus(dlurl,prom);         
+          }//if
+        });//download
+        
+        
+        /* without the break all downloads will start immediately */
+        /* with break only only one file at once will downloaded FF has problems with this */
+        break;        
+        }//if               
+      }//for
+    
+    if( !something2down )
+      {
+      //console.log('nichts mehr');
+      }
+    }); //storage get    
+  }  
   
 /* 
    UnMarkILinksInDOC
@@ -922,4 +1146,29 @@ function UnMarkILinksInDOC(doc,w)
     lk.removeAttribute('dco_m');    
     }
       
-  }          
+  }
+
+/* 
+   updateDLstatus
+   set status of dl-url
+   @var url (string)
+   @var b (string | number)
+*/  
+function updateDLstatus(url,b)
+  {
+  browser.storage.local.get(null, function(data) {
+    var dls = JSON.parse(data.downloads);
+    var length = Object.keys(dls).length;
+    for(var d=0; d<length;d++)
+      {
+      var dltype = dls[d]['type'];
+      var dlname = dls[d]['name'];
+      var dlurl = dls[d]['url']; 
+      var dlstate = dls[d]['state']; 
+      if( dlurl==url )
+        dls[d]['state'] = b;
+        browser.storage.local.set({ downloads: JSON.stringify(dls) }, function() {                  
+          });//storage set         
+        }//for      
+    });//storage get    
+  }       
