@@ -9,7 +9,7 @@
     "open_in_tab": true
   },
   "background": {
-    "scripts": ["js/browser.js","js/background.js","js/extension.functions.js"],
+    "scripts": ["js/browser.js","js/extension.functions.js","js/background.js"],
     "persistent": true
   },
   "browser_action": {
