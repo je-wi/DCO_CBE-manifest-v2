@@ -37,7 +37,7 @@ var title_h2_lve = document.querySelector('#popup_h2_lve'); // title lv
     isActiveSwitch.checked = data.isActive;
     LVisActive.checked = data.LVisActive;
     LVEisActive.checked = data.LVEisActive;
-    var isArchiveLoaded = data.archiveLoaded; 
+    var isArchiveLoaded = data.archiveLoaded;
 
     if( data.isActive )
       {
@@ -289,7 +289,8 @@ var title_h2_lve = document.querySelector('#popup_h2_lve'); // title lv
             
             browser.storage.local.set({archiveLoaded: true, tabId: tab.id }, function(){}); 
             
-           
+            browser.tabs.update(tab.id, { active: true } ) ;
+
             /* browser.js */
             browser.tabs.executeScript(tab.id, { file: 'js/browser.js' }, function() 
               {
@@ -309,13 +310,22 @@ var title_h2_lve = document.querySelector('#popup_h2_lve'); // title lv
               {
               if (browser.runtime.lastError)
                 console.log('There was an error inserting css css/main.css: \n' + browser.runtime.lastError.message);
-              });            
+              });
+              
+            browser.tabs.executeScript(tab.id, { file: 'js/content_lv.js' }, function() 
+              {
+              if (browser.runtime.lastError)
+                console.log('There was an error injecting script js/content_lv.js: \n' + browser.runtime.lastError.message);
+              });                          
 
             browser.tabs.executeScript(tab.id, { file: 'js/dco_archive.js' }, function() 
               {
               if (browser.runtime.lastError)
                 console.log('There was an error injecting script js/content_lv.js: \n' + browser.runtime.lastError.message);
               });
+           
+              
+              
            }); 
          
           }                 
