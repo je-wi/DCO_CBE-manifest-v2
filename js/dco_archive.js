@@ -18,7 +18,9 @@ contain a set of viewable urls
 */
 
 var xml_div;
-var content2show;   
+var content2show;  
+
+
 
   browser.storage.local.get(null, function(data)
     {  
