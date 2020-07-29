@@ -5,52 +5,56 @@
      
 */ 
 
-var dco_cbe_co = document.getElementById('dco_cbe_co');
-
-browser.storage.local.get(null, function(data)
-  { 
-  var LVisActive = data.LVisActive;
-  var LVEisActive = data.LVEisActive;
-  var isActive = data.isActive; 
-  var linkdelay = parseInt(data.option1);
-  var i = 0;
-  var ok = 0;
-  var nok = 0;
-
+if( browser!=undefined && document!=undefined )
+  {
+  var dco_cbe_co = document.getElementById('dco_cbe_co');
   
-  if( isActive )  
-    {
-    document.querySelectorAll('.dco_cbe_lk').forEach(function(dco_cbe_link) {
-    var ld = i * linkdelay;             
-      setTimeout(function(){  
-          var url = dco_cbe_link.href;
-
-          doRequest(url, 'HEAD', function(request) {
-            if(request.status==200)
-              {
-              dco_cbe_link.classList.remove('dco_cbe_lk');   
-              //dco_cbe_link.classList.add('dco_cbe_lk_ok');
-              ok++;
-              dco_cbe_co.innerHTML+='<span class="dco_cbe_lk_ok">ok: '+url+'</span><br />';
-              }
-            else
-              {
-              dco_cbe_link.classList.remove('dco_cbe_lk');   
-              dco_cbe_link.classList.add('dco_cbe_lk_nok');
-              nok++; 
-              dco_cbe_co.innerHTML+='<span class="dco_cbe_lk_nok">'+request.status+': '+url+'</span><br />';             
-              } 
-            // 
-            //dco_cbe.innerHTML= "ok: "+ok+'<br />';   
-            //dco_cbe.innerHTML+= "nok: "+nok+'<br />';                          
-            });
-        }, ld);  
+  browser.storage.local.get(null, function(data)
+    { 
+    var LVisActive = data.LVisActive;
+    var LVEisActive = data.LVEisActive;
+    var isActive = data.isActive; 
+    var linkdelay = parseInt(data.option1);
+    var i = 0;
+    var ok = 0;
+    var nok = 0;
+  
     
-      i++;
-      });   
-        
-   };    
+    if( isActive )  
+      {
+      document.querySelectorAll('.dco_cbe_lk').forEach(function(dco_cbe_link) {
+      var ld = i * linkdelay;             
+        setTimeout(function(){  
+            var url = dco_cbe_link.href;
+  
+            doRequest(url, 'HEAD', function(request) {
+              if(request.status==200)
+                {
+                dco_cbe_link.classList.remove('dco_cbe_lk');   
+                //dco_cbe_link.classList.add('dco_cbe_lk_ok');
+                ok++;
+                dco_cbe_co.innerHTML+='<span class="dco_cbe_lk_ok">ok: '+url+'</span><br />';
+                }
+              else
+                {
+                dco_cbe_link.classList.remove('dco_cbe_lk');   
+                dco_cbe_link.classList.add('dco_cbe_lk_nok');
+                nok++; 
+                dco_cbe_co.innerHTML+='<span class="dco_cbe_lk_nok">'+request.status+': '+url+'</span><br />';             
+                } 
+              // 
+              //dco_cbe.innerHTML= "ok: "+ok+'<br />';   
+              //dco_cbe.innerHTML+= "nok: "+nok+'<br />';                          
+              });
+          }, ld);  
       
-  // console.log( JSON.stringify(data));
+        i++;
+        });   
+          
+     };    
+        
+    // console.log( JSON.stringify(data));
+  
+    });
+  }//end if
 
-  });
