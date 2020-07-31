@@ -31,20 +31,16 @@ if( browser!=undefined && document!=undefined )
               if(request.status==200)
                 {
                 dco_cbe_link.classList.remove('dco_cbe_lk');   
-                //dco_cbe_link.classList.add('dco_cbe_lk_ok');
                 ok++;
-                dco_cbe_co.innerHTML+='<span class="dco_cbe_lk_ok">ok: '+url+'</span><br />';
+                dco_cbe_co.innerHTML = '<span class="dco_cbe_lk_ok">ok: '+url+'</span><br />'+ dco_cbe_co.innerHTML;
                 }
               else
                 {
                 dco_cbe_link.classList.remove('dco_cbe_lk');   
                 dco_cbe_link.classList.add('dco_cbe_lk_nok');
                 nok++; 
-                dco_cbe_co.innerHTML+='<span class="dco_cbe_lk_nok">'+request.status+': '+url+'</span><br />';             
-                } 
-              // 
-              //dco_cbe.innerHTML= "ok: "+ok+'<br />';   
-              //dco_cbe.innerHTML+= "nok: "+nok+'<br />';                          
+                dco_cbe_co.innerHTML = '<span class="dco_cbe_lk_nok">'+request.status+': '+url+'</span><br />'+dco_cbe_co.innerHTML;             
+                }                     
               });
           }, ld);  
       
@@ -52,9 +48,6 @@ if( browser!=undefined && document!=undefined )
         });   
           
      };    
-        
-    // console.log( JSON.stringify(data));
   
     });
   }//end if
-
