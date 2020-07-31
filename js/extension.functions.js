@@ -126,7 +126,7 @@ function dcoArchiveSomeExtraButtons()
       
       var xmlfile = data.option3+"_issues_"+getDateFromNow(2)+".xml";  
        
-dco_cbe_co.innerHTML+='downloading:<br>'+xmlfile+'<br>';  
+dco_cbe_co.innerHTML='<br>downloading:<br>'+xmlfile+'<br>'+dco_cbe_co.innerHTML;  
 
       downloadElementAsXML(content, xmlfile, content);    
       });      
@@ -149,7 +149,7 @@ dco_cbe_co.innerHTML+='downloading:<br>'+xmlfile+'<br>';
         var pdfs = content2show.querySelectorAll('.obj_galley_link.pdf');  
         var pdfs_array = []; 
 
-dco_cbe_co.innerHTML+='downloading:<br>';
+dco_cbe_co.innerHTML='<br>downloading:<br>'+dco_cbe_co.innerHTML;
 
           /* log download-status to local storage */
           var dl = {};
@@ -167,9 +167,9 @@ dco_cbe_co.innerHTML+='downloading:<br>';
             dl[p]['state'] = 'queue';
             dl[p]['name'] = fname2download; 
             
-            dco_cbe_co.innerHTML+='queued: '+fname2download+'<br>';                     
+            dco_cbe_co.innerHTML='<br>queued: '+fname2download+''+dco_cbe_co.innerHTML;                     
             } 
-          dco_cbe_co.innerHTML+=pdfs.length+' downloads queued';
+          dco_cbe_co.innerHTML='<br>'+pdfs.length+' downloads queued'+dco_cbe_co.innerHTML;
           
           browser.storage.local.remove('downloads',function() {});
           browser.storage.local.set({ downloads: JSON.stringify(dl) }, function() { 
@@ -214,9 +214,20 @@ dco_cbe_co.innerHTML+='downloading:<br>';
           /* log download-status to local storage */
           var dl = {};
           for(var p=0; p<length;p++ ) 
-            { 
-            let pdf2down = pdfs[p].innerHTML.trim().replace('view','download');
-            dl[pdf2down] = false;
+            {
+            let pdf2down = pdfs[p].innerHTML.trim().replace('view','download'); 
+            
+            dl[p] = {};
+            dl[p]['url'] = pdf2down;
+            dl[p]['type'] = 'xml';
+            dl[p]['state'] = 'queue';
+            
+            let n = pdf2down.indexOf("download/")+9;
+            let zu = ( pdf2down.indexOf('issue')!=-1 )?'issue':'article';
+            let fname2download = pdf2down.substring( n );
+            fname2download = data.option3+'_'+zu+'_'+fname2download.replace(/\//g,'_')+'.xml';            
+            
+            dl[p]['name'] = fname2download; 
             } 
           
           browser.storage.local.remove('downloads',function() {});
@@ -231,19 +242,13 @@ dco_cbe_co.innerHTML+='downloading:<br>';
               Array.prototype.slice.call(pdfs[p].parentNode.attributes).forEach(function(item) {        
                 embed.setAttribute(item.name,item.value);
               }); 
-      
-              //pdfs[p].parentNode.appendChild(embed);
-              
-          
               let request = new XMLHttpRequest();
               let pdf2down = pdfs[p].innerHTML.trim().replace('view','download');
-              
-               
+
               request.open('GET', pdf2down, true);
               request.responseType = 'blob'; 
               request.extraInfo = p; 
-              
-          
+
               request.onload = function() {
       
                 let reader = new FileReader();
@@ -261,7 +266,7 @@ dco_cbe_co.innerHTML+='downloading:<br>';
                   fname2download = data.option3+'_'+zu+'_'+fname2download.replace(/\//g,'_')+'.xml';           
                 downloadElementAsXML(embed, fname2download, dco_archive_content);  
       
-      dco_cbe_co.innerHTML+=reader.extraInfo2+' loaded<br>';
+      dco_cbe_co.innerHTML='<br>'+fname2download+' loaded'+dco_cbe_co.innerHTML;
                 
                 updateDLstatus(pdfurl,true);  
 
@@ -557,8 +562,7 @@ function getHighestZ(doc)
   }    
   
 /* listenDownloadsChange
-   listener for change-events from browser.downloads
-   
+      
    @need browser.downloads
    @need browser.storage
    @use browser.downloads.onChanged.addListener(listenDownloadsChange);
@@ -574,15 +578,22 @@ function listenDownloadsChange(item)
       var length = Object.keys(dls).length;      
       for(var d=0; d<length;d++)
         {
-        let dltype = dls[d]['type'];
-        let dlname = dls[d]['name'];
-        let dlurl = dls[d]['url']; 
-        let dlstate = dls[d]['state']; 
-         if(dlstate==id) 
+        let dltype = dls[d]['type'] || '';
+        let dlname = dls[d]['name'] || '';
+        let dlurl = dls[d]['url'] || ''; 
+        let dlstate = dls[d]['state'] || ''; 
+         if(dltype=='pdf' && dlstate==id) 
            {
            updateDLstatus(dlurl,'complete');
 //console.log(d+': '+dlurl);
-          
+
+          browser.tabs.executeScript(newdata.tabId, { code: 'var dco_cbe_co = document.getElementById("dco_cbe_co"); if(dco_cbe_co) dco_cbe_co.innerHTML="<br>completed: '+dlname+'"+dco_cbe_co.innerHTML;' }, function() 
+            {
+            if (browser.runtime.lastError) 
+              console.log('There was an error injecting script in listenOnMessage: \n' + browser.runtime.lastError.message);
+            });
+
+
            /* necessary if the startBulkDownload takes only one at a time */
            /* recursiv function-call */
            /* ff had sometimes problems and stopped the recursive call - we try it with timeout */
@@ -595,8 +606,7 @@ function listenDownloadsChange(item)
   }
   
 /* listenOnInstalled
-   listener for onInstall-event from browser.runtime
-   
+      
    @need browser.storage
    @need browser.browserAction   
    @use browser.runtime.onInstalled.addListener(listenOnInstalled);
@@ -628,8 +638,7 @@ function listenOnInstalled()
   } 
   
 /* listenOnMessage
-   listener for onActivated-event from browser.tabs
-   
+      
    @need browser.storage
    @use browser.runtime.onMessage.addListener(listenOnMessage);
 */
@@ -640,13 +649,12 @@ function listenOnMessage(arg, sender, sendResponse)
     /* safari dont support downloads */      
     startBulkDownload('pdf');
     sendResponse({response: "Downloads started"});     
-    }
+    } 
   return true;    
   }   
   
 /* listenTabActivated
-   listener for onActivated-event from browser.tabs
-   
+      
    @need browser.storage
    @use browser.tabs.onActivated.addListener(listenTabActivated);
 */
@@ -666,8 +674,7 @@ function listenTabActivated(info)
   } 
   
 /* listenTabUpdated
-   listener for onActivated-event from browser.tabs
-   
+      
    @need browser.storage
    @use browser.tabs.onUpdated.addListener(listenTabUpdated);
 */
