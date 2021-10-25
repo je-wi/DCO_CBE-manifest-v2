@@ -48,5 +48,9 @@ Top- and second-level domain must not be the same to mark the link.
 ### Download all Issues as XML
 Same as PDF 
 
+## Options
+
+![Screen](/readme_img/003_options.jpg)
+
 
 
