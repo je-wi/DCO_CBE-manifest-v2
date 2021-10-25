@@ -8,6 +8,7 @@ Top- and second-level domian must be the same to mark the link.
 
 ### LV extern
 (Must be considered as deprecated. Modern Browser block most of the XMLHttpRequests to extern domaisn with '.. has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.'
+
 Top- and second-level domain must not be the same to mark the link.
 
 
