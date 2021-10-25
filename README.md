@@ -1,7 +1,7 @@
 # DCO_CBE
 
 ### v01
-Initial Version CBE
+Initial Version from CBE
 
 ### v02
 * LV intern: validate all inern links
