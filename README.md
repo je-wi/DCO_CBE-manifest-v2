@@ -38,6 +38,8 @@ Top- and second-level domain must not be the same to mark the link.
 
 ## DCO Archive
 
+![Screen](/readme_img/002_download.jpg)
+
 ### XML-Directory
 
 ### Download all Issues as PDF
