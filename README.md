@@ -1,9 +1,9 @@
 # DCO_CBE
 
-## v01
+### v01
 Initial Version CBE
 
-## v02
+### v02
 * LV intern: validate all inern links
 * LV extern: validate all extern links
 * DCO Archive: show all issues with articles in one site
@@ -14,7 +14,7 @@ Initial Version CBE
   * Journal URL
   * Journal Shortname
 
-## v03
+### v03
 * DCO Archive: download all PDF-galleys at once as XML
 * Options:
   * Download count
