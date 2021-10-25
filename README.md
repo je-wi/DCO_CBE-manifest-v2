@@ -1,9 +1,9 @@
 # DCO_CBE
 
-## v1
+## v01
 Initial Version CBE
 
-## v2
+## v02
 * LV intern: validate all inern links
 * LV extern: validate all extern links
 * DCO Archive: show all issues with articles in one site
@@ -13,6 +13,12 @@ Initial Version CBE
   * Validation delay in seconds
   * Journal URL
   * Journal Shortname
+
+## v03
+* DCO Archive: download all PDF-galleys at once as XML
+* Options:
+  * Download count
+  * Download interval in seconds
 
 ## Link Validation
 Looks for all a-Tags in the active Tab and marks them with an extra class, the attribute "dco_m" andd the attribute "href_origin". With the button in the popup everey marked url can validate with a HEAD-request. 
