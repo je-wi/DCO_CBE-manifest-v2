@@ -62,6 +62,7 @@ For each article are listed:
 ![Screen](/readme_img/003_download.jpg)
 
 ### XML-Directory
+The displayed archive page can be downloaded as an XML file.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
