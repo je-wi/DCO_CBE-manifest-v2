@@ -116,6 +116,7 @@ The displayed archive page can be downloaded as an XML file.
 ```
 
 ### Download all Issues as PDF
+The PDF galleys of all issues and their individual contributions can be downloaded at once. The download iterates over a queue with adjustable delay from 3 to 5 seconds.
 
 
 ### Download all Issues as XML
