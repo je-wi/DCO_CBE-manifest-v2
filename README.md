@@ -1,5 +1,8 @@
 # DCO_CBE
 
+The extension was developed in Manifest v2, including tabs.executeScript and background page.
+Because of the currently unclear support of Manifest v3 in the various browsers, the extension is explicitly named after version 2, so that no ambiguity can arise regarding v3 compatibility.
+
 The extension uses following JavaScript APIs:
 * browserAction
 * downloads
