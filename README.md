@@ -120,7 +120,7 @@ The PDF galleys of all issues and their individual contributions can be download
 
 
 ### Download all Issues as XML
-Same as PDF 
+As for PDF, only in the form of XML with Base64 encoded string.
 
 ## Options
 
