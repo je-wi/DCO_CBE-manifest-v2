@@ -37,7 +37,7 @@ Looks for all a-Tags in the active Tab and marks them with an extra class, the a
 Top- and second-level domian must be the same to mark the link.
 
 ### LV extern
-(Must be considered as deprecated. Modern Browser block most of the XMLHttpRequests to extern domains by CORS policy: 
+(Must be considered as deprecated. Modern Browsers block most of the XMLHttpRequests to extern domains by CORS policy: 
 ```javascript
 .. has been blocked by CORS policy: 
 Response to preflight request doesn't pass access control check: 
