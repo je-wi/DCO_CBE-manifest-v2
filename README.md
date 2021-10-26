@@ -1,5 +1,13 @@
 # DCO_CBE
 
+The extension uses following JavaScript APIs:
+* browserAction
+* downloads
+* i18n
+* runtime
+* storage
+* tabs
+
 ### v01
 Initial Version from CBE
 
@@ -51,6 +59,9 @@ Same as PDF
 ## Options
 
 ![Screen](/readme_img/003_options.jpg)
+
+## Installation
+
 
 
 
