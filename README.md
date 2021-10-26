@@ -49,6 +49,16 @@ Top- and second-level domain must not be the same to mark the link.
 
 ## DCO Archive
 
+Lists all issues with all articles. 
+
+For each article are listed:
+* Title
+* Authorship
+* Link to PDF Galley
+* Abstract
+* DOI
+* URN (no longer supported since 2021)
+
 ![Screen](/readme_img/003_download.jpg)
 
 ### XML-Directory
