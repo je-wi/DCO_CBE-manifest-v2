@@ -129,7 +129,6 @@ As for PDF, only in the form of XML with Base64 encoded string.
 
 ![Screen](/readme_img/004_options.jpg)
 
-## Installation
 
 
 
