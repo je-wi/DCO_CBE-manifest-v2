@@ -127,6 +127,12 @@ As for PDF, only in the form of XML with Base64 encoded string.
 
 ## Options
 
+* Validation delay in seconds
+* Journal URL
+* Journal Shortname
+* Download count
+* Download interval in seconds
+
 ![Screen](/readme_img/004_options.jpg)
 
 
